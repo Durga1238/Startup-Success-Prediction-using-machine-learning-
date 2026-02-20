@@ -1,0 +1,416 @@
+# *Machine Learning Startup Success Predictor*
+
+A full-stack machine learning application that predicts startup success using over 50,000+ company data points spanning 1990-2015. Built with peer reviewed academic validation methodology and powered by XGBoost. Prior to full-stack implementation, comprehensive analysis was conducted through five documented notebooks: exploratory data analysis, preprocessing and feature engineering, modeling development, performance evaluation, and production pipeline setup.
+
+## Table of Contents
+- [Frontend, Backend, Data, & Notebook READMEs (More Detail & Visual Examples)](#frontend-backend-data--notebook-readmes-more-detail--visual-examples)
+- [Overview](#overview)
+- [Why Did I Build This?](#why-did-i-build-this)
+- [Key Features](#key-features)
+- [System Architecture](#system-architecture)
+- [Demo GIFs](#demo-gifs)
+- [Technology Stack](#technology-stack)
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [Notebooks](#notebooks)
+- [Methodology & Academic Foundation](#methodology--academic-foundation)
+- [Overall Model Performances](#overall-model-performances)
+- [Use Cases](#use-cases)
+- [API Documentation](#api-documentation)
+- [Academic Context](#academic-context)
+- [Contributing](#contributing)
+- [License](#license)
+- [Author](#author)
+- [Acknowledgments & References](#acknowledgments--references)
+
+## Frontend, Backend, Data, & Notebook READMEs (More Detail & Visual Examples)
+
+For more **comprehensive**, **specific**, and **thorough** documentation and examples:
+- [Frontend README](startup-predictor/README.md)
+- [Backend README](src/README.md)
+- [Data README](data/README.md)
+- [Notebooks README](notebooks/README.md)
+
+## Overview
+
+This project implements and extends the bias free startup success prediction methodology from Żbikowski & Antosiuk (2021). This repository provides:
+
+- **Machine Learning Models**: XGBoost, Logistic Regression, and SVM with documentation, analysis, and evaluation
+- **Interactive Web Application**: React/Next.js frontend with FastAPI backend
+- **Model Interpretability**: SHAP explanations for individual predictions
+- **Academic Validation**: Reproduces and extends published research methodology
+
+### Key Results (XGBoost Model)
+- **F1-Score**: 29.1% 
+- **AUC-ROC**: 79.0% 
+- **Recall**: 38.8% 
+- **Precision**: 23.4%
+
+## Why Did I Build This?
+
+As a Statistics and Data Science student at UCSB, I wanted to create a project that goes beyond coursework. My background and interests lie around machine learning, artificial intelligence, data science, and software engineering. I set out to build something that's academically rigorous, professionally relevant, and personally meaningful.
+
+Startups fascinate me. They combine innovation, data, and uncertainty. This is the perfect space to apply machine learning. I came across an academic paper that used a bias-free ML approach to predict startup success, and I saw an opportunity: What if I could not only replicate that research but extend it with different techniques, real world applications, and a full stack production-ready interface?
+
+This project became my way of learning how to build an end to end machine learning pipeline, from raw data and literature review to model deployment and interactive demo. I performed exploratory data analysis, built reusable preprocessing pipelines, engineered high-value features, trained and evaluated multiple models, and explored the business implications of different success definitions. I also integrated explainable AI using SHAP, conducted temporal validation across decades, and compared academic versus venture capital perspectives on startup success.
+
+While I had previously built full stack web applications and retrieval augmented generation (RAG) systems, this project was an opportunity to go deeper. I challenged myself to learn new tools like FastAPI for backend development, Next.js for a polished frontend, and Tailwind CSS for rapid UI design. It pushed me to improve as a student aiming to work around data, machine learning, software development, and artifical intelligence!
+
+## Key Features
+
+### Machine Learning Pipeline
+- **22 Engineered Features** across geographic, industry, and temporal dimensions
+- **Bias Prevention** using only founding-time information
+- **Cross-Validation** with 5-fold stratified approach
+- **SHAP Integration** for model interpretability
+
+### Web Application
+- **Real-time Predictions** with confidence intervals
+- **Interactive UI** with searchable dropdowns for 750+ regions/cities
+- **Multi-category Selection** from 15 industry categories
+- **Visual Explanations** showing key success factors
+
+## System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     Next.js Frontend                            │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                 │
+│ │ Main        │ │ About       │ │ Prediction  │                 │
+│ │ Page        │ │ Page        │ │ Results     │                 │
+│ └─────────────┘ └─────────────┘ └─────────────┘                 │
+│                                                                 │
+│ ┌─────────────┐                 ┌─────────────┐                 │
+│ │User         │                 │SHAP         │                 │
+│ │Inputs       │                 │Results      │                 │
+│ └─────────────┘                 └─────────────┘                 │
+└─────────────────────────┼───────────────────────────────────────┘
+                          │ 
+┌─────────────────────────┼───────────────────────────────────────┐
+│                   FastAPI Backend                               │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                 │
+│ │ Prediction  │ │ Explanation │ │ Health      │                 │
+│ │ Endpoint    │ │ Endpoint    │ │ Check       │                 │
+│ └─────────────┘ └─────────────┘ └─────────────┘                 │
+│                                                                 │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                 │
+│ │Data         │ │SHAP         │ │Model        │                 │
+│ │Preprocessor │ │Explainers   │ │Loader       │                 │
+│ └─────────────┘ └─────────────┘ └─────────────┘                 │
+└─────────────────────────┼───────────────────────────────────────┘
+                          │ 
+┌─────────────────────────┼───────────────────────────────────────┐
+│                  Machine Learning Layer                         │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                 │
+│ │ XGBoost     │ │ Logistic    │ │ SVM RBF     │                 │
+│ │ Model       │ │ Regression  │ │ Model       │                 │
+│ └─────────────┘ └─────────────┘ └─────────────┘                 │
+└─────────────────────────┼───────────────────────────────────────┘
+                          │ 
+┌─────────────────────────┼───────────────────────────────────────┐
+│                     Data Layer                                  │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                 │
+│ │Crunchbase   │ │Preprocessed │ │Model        │                 │
+│ │Dataset      │ │Features     │ │Artifacts    │                 │
+│ │(50k+)       │ │(22 dims)    │ │(.pkl files) │                 │
+│ └─────────────┘ └─────────────┘ └─────────────┘                 │
+│                                                                 │
+│ ┌─────────────┐ ┌─────────────┐                                 │
+│ │Categories   │ │SHAP         │                                 │
+│ │Reference    │ │Explainer    │                                 │
+│ │Data         │ │Objects      │                                 │
+│ └─────────────┘ └─────────────┘                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Demo GIFs
+
+![demogif1](https://github.com/user-attachments/assets/eaab2a81-6c1e-4d78-994b-a1974b251f69)
+
+![demogif2](https://github.com/user-attachments/assets/360d4668-2e8a-42fa-9c7a-efb9df96b0b9)
+
+![demogifabout](https://github.com/user-attachments/assets/1b7efa3e-44ca-4d0c-a75f-07d21ff691a8)
+
+![demogif3](https://github.com/user-attachments/assets/e69a0d4a-f705-403d-8e69-41dd0e36d6bd)
+
+## Technology Stack
+
+### Machine Learning & Data Science
+- **Python**: High-level programming language for data science and machine learning
+- **XGBoost**: Optimized gradient boosting framework for high-performance ML models
+- **Logistic Regression with Regularization**: Linear classification algorithm with penalty terms to prevent overfitting
+- **SVM with RBF Kernel**: Support Vector Machine using radial basis function for non-linear classification
+- **SHAP**: Model interpretability library providing unified approach to explain predictions
+- **Jupyter**: Interactive computing environment for data analysis and model development
+- **Pandas**: Data manipulation and analysis library for structured data processing
+- **NumPy**: Fundamental package for numerical computing and array operations
+- **Matplotlib**: Comprehensive plotting library for creating static visualizations
+- **Seaborn**: Statistical data visualization library built on matplotlib
+- **scikit-learn**: Machine learning library with algorithms for classification, regression, and preprocessing
+
+### Frontend
+- **React**: JavaScript library for building interactive user interfaces with component-based architecture
+- **Next.js**: Full stack React framework with server-side rendering and routing capabilities
+- **TypeScript**: Typed superset of JavaScript providing static type checking and enhanced development experience
+- **Tailwind CSS**: Utility first CSS framework for rapid UI development with pre-built styling classes
+
+### Backend
+- **FastAPI**: Modern, fast web framework for building APIs with automatic documentation and type hints
+- **Pydantic**: Data validation library using Python type annotations for request/response schemas
+- **Uvicorn**: Lightning fast ASGI server for serving Python web applications in production
+- **Data Processing**: Pipeline to transform user input into feature vectors for trained model inference
+
+## Project Structure
+
+```
+ML_STARTUP_SUCCESS_PREDICTOR
+├── app/
+│   └── app.py
+├── data/
+│   ├── processed/
+│   ├── raw/
+│   └── README.md
+├── notebooks/
+│   ├── 01_data_exploration.ipynb
+│   ├── 02_data_preprocessing.ipynb
+│   ├── 03_modeling.ipynb
+│   ├── 04_evaluation.ipynb
+│   ├── 05_pipeline.ipynb
+│   └── README.md
+├── results/
+│   ├── figures/
+│   ├── models/
+│   └── reports/
+├── src/
+│   ├── data_preprocessing.py
+│   ├── data_util.py
+│   └── README.md
+├── startup-predictor/
+│   ├── app/
+│   │   ├── about/
+│   │   │   └── page.tsx
+│   │   ├── page.tsx
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   └── layout.tsx
+│   ├── node_modules/
+│   ├── public/
+│   │   ├── file.svg
+│   │   ├── globe.svg
+│   │   ├── next.svg
+│   │   ├── vercel.svg
+│   │   └── window.svg
+│   ├── styles/
+│   │   └── app.css
+│   ├── .gitignore
+│   ├── next.config.mjs
+│   ├── package.json
+│   ├── tailwind.config.json
+│   ├── tsconfig.json
+│   └── README.md
+├── README.md
+├── requirements.txt
+├── LICENSE
+├── .env
+├── .gitattributes
+└── .gitignore
+```
+
+## Quick Start
+
+### Prerequisites
+- Python 3.8+S
+- Node.js 16+
+- pip and npm
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/RyanFabrick/Startup-Success-Prediction.git
+cd Startup-Success-Prediction
+```
+
+### 2. Backend Setup
+```bash
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Start FastAPI server
+cd app
+python app.py
+# Server runs on http://localhost:8000
+```
+
+### 3. Frontend Setup
+```bash
+# Install Node dependencies
+cd startup-predictor
+npm install
+
+# Start development server
+npm run dev
+# Application runs on http://localhost:3000
+```
+
+### 4. API Health Check
+```bash
+curl http://localhost:8000/health
+```
+
+### Environment Variables
+
+The application requires environment variables to be configured for proper operation.
+
+```bash
+# Environment (.env)
+cp .env.example .env
+# Configure settings as needed
+```
+
+## Notebooks
+
+The complete data process and analysis is documented across five notebooks:
+
+1. **[01_EDA](notebooks/01_data_exploration.ipynb)** 
+2. **[02_Preprocessing_&_Feature_Engineering](notebooks/02_data_preprocessing_feature_engineering.ipynb)** 
+3. **[03_Modeling](notebooks/03_modeling.ipynb)** 
+4. **[04_Evaluation](notebooks/04_evaluation.ipynb)** 
+5. **[05_Pipeline_Setup](notebooks/05_pipeline_setup.ipynb)**
+
+Each notebook is self contained with thorughly detailed documentation for each step and can be run independently. Go to the [Notebooks README](notebooks/README.md) for more information.
+
+## Methodology & Academic Foundation
+
+### Research Validation
+Based on **"A machine learning, bias-free approach for predicting business success using Crunchbase data"** (Żbikowski & Antosiuk, 2021). In my implementation I attempt to:
+
+- **Reproduces** the original bias-free methodology
+- **Extends** with enhanced feature engineering (22 vs 8 features)
+- **Validates** across multiple economic cycles (1995-2015)
+- **Compares** academic vs practical success definitions
+
+### Feature Engineering
+- **Geographic Factors** (3): Region/city startup density rankings, US indicator
+- **Industry Categories** (15): Binary encoding for major startup sectors
+- **Temporal Features** (4): Standardized founding year, economic era classification
+
+### Success Definition
+**Academic Success**: Company acquired OR (still operating AND reached Series B funding)
+- Eliminates look ahead bias by using only founding time features
+- Focuses on observable outcomes rather than subjective metrics
+
+## Overall Model Performances
+
+| Model               | Precision | Recall | F1-Score | AUC-ROC |
+|:--------------------|----------:|-------:|---------:|--------:|
+| Logistic Regression |     0.169 |  0.709 |    0.273 |   0.781 |
+| SVM (RBF)           |     0.155 |  0.689 |    0.252 |   0.740 |
+| XGBoost             |     0.234 |  0.388 |    0.291 |   0.790 |
+| Academic Target     |     0.570 |  0.340 |    0.430 |   NAN   |
+
+
+## Use Cases
+
+### For Entrepreneurs
+- **Validate business ideas** against historical success patterns
+- **Identify key risk factors** before launching
+- **Benchmark** against similar companies
+
+### For Investors
+- **Screen opportunities** with data driven insights
+- **Supplement due diligence** with quantitative analysis
+- **Understand** geographic and industry trends
+
+### For Students and Researchers
+- **Academic validation** of published methodologies
+- **Study** startup ecosystem patterns
+- **Explore** bias-free prediction techniques
+
+## API Documentation
+
+### Core Endpoints
+- `POST /predict` - Basic success prediction
+- `POST /predict/explain` - Prediction with SHAP explanations
+- `GET /categories` - Available industry categories
+- `GET /regions` - Searchable region list
+- `GET /cities` - Searchable city list
+- `GET /health` - System status
+
+### Example Request
+```python
+import requests
+
+data = {
+    "country_code": "USA",
+    "region": "SF Bay Area",
+    "city": "San Francisco",
+    "category_list": "software mobile",
+    "founded_year": 2010
+}
+
+response = requests.post("http://localhost:8000/predict/explain", json=data)
+prediction = response.json()
+```
+
+## Academic Context
+
+### Literature Foundation
+This project validates and extends the methodology from:
+
+[Żbikowski, K., & Antosiuk, P. (2021). A machine learning, bias-free approach for predicting business success using Crunchbase data. *Information Processing and Management*, 58(4), 102555.](https://www.sciencedirect.com/science/article/pii/S0306457321000595)
+
+This study presents an academically and technically comprehensive machine learning approach to predict startup success while explicitly addressing the look ahead bias problem that plagues most existing research in this domain. The authors analyzed 213,171 companies from the Crunchbase database to develop practically applicable prediction models. While numerous studies have attempted to predict business success using machine learning, they typically suffer from methodological flaws that make their results impractical for actual investment decisions.
+
+This research establishes a new standard for startup success prediction by prioritizing practical applicability over theoretical performance, providing a valuable tool for data-driven investment decisions while advancing our understanding of entrepreneurial success factors. I used it as both context and inspiration for this project!
+
+### Key Contributions
+1. **Independent validation** using separate dataset
+2. **Enhanced feature engineering** with funding progression metrics
+3. **Temporal robustness** across multiple economic cycles
+4. **Production deployment** with interactive explanations
+
+## Contributing
+
+This project was developed as a personal learning project. For future questions and/or suggestions:
+
+1. Open an issue describing the enhancement or bug
+2. Fork the repository and create a feature branch
+3. Follow coding standards
+4. Write tests for new functionality
+5. Update documentation as needed
+6. Submit a pull request with detailed description of changes
+
+## License
+
+This project is open source and available under the MIT License.
+
+## Author
+
+**Ryan Fabrick**
+- Statistics and Data Science (B.S) Student, University of California Santa Barbara
+- GitHub: [https://github.com/RyanFabrick](https://github.com/RyanFabrick)
+- LinkedIn: [www.linkedin.com/in/ryan-fabrick](https://www.linkedin.com/in/ryan-fabrick)
+- Email: ryanfabrick@gmail.com
+
+## Acknowledgments & References
+
+- **[Żbikowski, K., & Antosiuk, P. (2021)](https://www.sciencedirect.com/science/article/pii/S0306457321000595)** - "A machine learning, bias-free approach for predicting business success using Crunchbase data." *Information Processing and Management*, 58(4), 102555
+- **[Crunchbase](https://www.crunchbase.com/)** - Startup and company database providing the 50,000+ company dataset for model training and validation
+- **[XGBoost](https://xgboost.readthedocs.io/)** - Optimized distributed gradient boosting library where machine learning algorithims are implemented under
+- **[scikit-learn](https://scikit-learn.org/)** - Machine learning library providing preprocessing, modeling, and evaluation tools including logistic regression and SVM implementations
+- **[Logistic Regression](https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression)** - Linear classification algorithm using logistic function for binary and multiclass prediction with probabilistic outputs
+- **[Support Vector Machine (SVM) with RBF Kernel](https://scikit-learn.org/stable/modules/svm.html#svm-classification)** - Non-linear classification algorithm using radial basis function kernel for complex decision boundaries
+- **[SHAP](https://shap.readthedocs.io/)** - (SHapley Additive exPlanations) Model interpretability library enabling prediction explanations
+- **[Pandas Community](https://pandas.pydata.org/)** - Data manipulation and analysis library
+- **[NumPy Community](https://numpy.org/)** - Fundamental package for scientific computing
+- **[Jupyter Project](https://jupyter.org/)** - Interactive computing environment for data analysis, processing, modeling, evaluation, and documentation
+- **[FastAPI](https://fastapi.tiangolo.com/)** - Modern, fast web framework for building APIs with Python
+- **[Uvicorn](https://www.uvicorn.org/)** - Lightning fast ASGI server for Python web applications
+- **[Pydantic](https://pydantic-docs.helpmanual.io/)** - Data validation library using Python type annotations
+- **[React Community](https://react.dev/)** - JavaScript library for building interactive user interfaces
+- **[Next.js Community](https://nextjs.org/)** - React framework enabling full stack web applications
+- **[Tailwind CSS](https://tailwindcss.com/)** - Utility first CSS framework for rapid UI development
+
+_________________________________________________
+Built with ❤️ for the machine learning community
+
+This personal project demonstrates my machine learning engineering skills, full stack development capabilities, and academic research validation. As a UCSB student, I designed this as an end to end showcase of my technical abilities across the complete ML pipeline - from literature review and data processing & analysis to model deployment and production ready web applications. It highlights my skills in ML algorithms, bias aware methodological design, model interpretability with SHAP, academic research validation, modern web development, and my passion for building data driven solutions and tools for entrepreneurs, investors, reseachers, and students.
